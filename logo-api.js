@@ -1,4 +1,3 @@
-// logo-api.js
 const express = require("express");
 const textpro = require("textmaker-thiccy"); // npm install textmaker-thiccy
 
@@ -15,7 +14,7 @@ const styles = {
   graffiti: "https://textpro.me/create-cool-wall-graffiti-text-effect-online-1009.html",
   thunder: "https://textpro.me/online-thunder-text-effect-generator-1031.html",
   matrix: "https://textpro.me/matrix-style-text-effect-online-884.html",
-  calligraphy: "https://textpro.me/calligraphy-text-effect-3d-online-1046.html" // ✅ Added
+  calligraphy: "https://textpro.me/calligraphy-text-effect-3d-online-1046.html"
 };
 
 // Root route
@@ -29,7 +28,7 @@ app.get("/logo", async (req, res) => {
 
   if (!text) return res.status(400).json({ error: "❌ Missing text parameter!" });
 
-  // random style
+  // Random style if none provided
   if (!style || style.toLowerCase() === "random") {
     const keys = Object.keys(styles);
     style = keys[Math.floor(Math.random() * keys.length)];
@@ -56,10 +55,15 @@ app.get("/logo", async (req, res) => {
   }
 });
 
+// Styles list endpoint (optional)
+app.get("/styles", (req, res) => {
+  res.json({ available_styles: Object.keys(styles) });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Logo API running on port ${PORT}`);
-});    res.json({
+});});    res.json({
       status: true,
       text,
       style,
