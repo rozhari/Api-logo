@@ -1,40 +1,65 @@
 // logo-api.js
 const express = require("express");
-const axios = require("axios");
+const textpro = require("textmaker-thiccy"); // npm install textmaker-thiccy
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/*
-Available styles:
-neon, glow, gradient, graffiti, matrix, thunder, ice, sketch
-*/
+// Available styles
+const styles = {
+  neon: "https://textpro.me/neon-text-effect-online-879.html",
+  glitch: "https://textpro.me/create-glitch-text-effect-style-tik-tok-983.html",
+  space: "https://textpro.me/create-space-3d-text-effect-online-985.html",
+  fire: "https://textpro.me/hot-fire-text-effect-online-921.html",
+  ice: "https://textpro.me/ice-cold-text-effect-862.html",
+  graffiti: "https://textpro.me/create-cool-wall-graffiti-text-effect-online-1009.html",
+  thunder: "https://textpro.me/online-thunder-text-effect-generator-1031.html",
+  matrix: "https://textpro.me/matrix-style-text-effect-online-884.html",
+  calligraphy: "https://textpro.me/calligraphy-text-effect-3d-online-1046.html" // ✅ Added
+};
 
-const BASE_URL = "https://textpro.me"; // External logo generator
-
-// Root route - just info
+// Root route
 app.get("/", (req, res) => {
-  res.send("✅ Logo API Running! Use /logo?text=Hello&style=neon");
+  res.send("✅ Logo API Running! Example: /logo?text=Hello&style=neon OR /logo?text=Hello&style=random");
 });
 
-// /logo?text=Hello&style=neon
+// Logo route
 app.get("/logo", async (req, res) => {
-  const { text, style } = req.query;
+  let { text, style } = req.query;
 
   if (!text) return res.status(400).json({ error: "❌ Missing text parameter!" });
-  if (!style) return res.status(400).json({ error: "❌ Missing style parameter!" });
+
+  // random style
+  if (!style || style.toLowerCase() === "random") {
+    const keys = Object.keys(styles);
+    style = keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  const url = styles[style.toLowerCase()];
+  if (!url) {
+    return res.status(400).json({
+      error: "❌ Invalid style! Available: " + Object.keys(styles).join(", ")
+    });
+  }
 
   try {
-    // Example API endpoint (You can replace with textmaker/thiccy-like API if available)
-    // This is a placeholder (simulate external call)
-    const url = `${BASE_URL}/${style}-text-effect-online-879.html`; // Style mapping needed
-
-    // Dummy response (replace with proper implementation if you use real generator)
-    const imageUrl = `https://dummyimage.com/600x200/000/fff.png&text=${encodeURIComponent(
-      text
-    )}+(${style})`;
-
+    const result = await textpro(url, [text]);
     res.json({
+      status: true,
+      text,
+      style,
+      result
+    });
+  } catch (err) {
+    console.error("API Error:", err);
+    res.status(500).json({ error: "❌ Error while generating logo!" });
+  }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Logo API running on port ${PORT}`);
+});    res.json({
       status: true,
       text,
       style,
